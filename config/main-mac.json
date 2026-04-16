@@ -1,41 +1,328 @@
 {
-  "machineName": "Main Dev Mac Mini",
+  "machineName": "Ferguss-Mini",
   "role": "main",
   "port": 3000,
   "host": "0.0.0.0",
   "services": [
     {
-      "id": "vscode",
-      "name": "VS Code",
-      "description": "Checks for a Visual Studio Code process",
-      "statusType": "process",
-      "statusCheck": "Visual Studio Code"
+      "id": "code-server",
+      "name": "code-server",
+      "description": "Browser-based VS Code bound locally and exposed over Tailscale HTTPS",
+      "statusType": "command",
+      "statusCheck": ["/bin/zsh", "scripts/code-server-status.sh"],
+      "startCommand": ["/bin/zsh", "scripts/start-code-server.sh"],
+      "stopCommand": ["/bin/zsh", "scripts/stop-code-server.sh"],
+      "logPath": "logs/code-server.log"
     },
     {
-      "id": "local-docs",
-      "name": "Local Docs",
-      "description": "Checks a local documentation server",
+      "id": "tailscale-serve-code-server",
+      "name": "Tailscale Serve for code-server",
+      "description": "HTTPS proxy on your tailnet for secure webviews and extension UIs",
+      "statusType": "command",
+      "statusCheck": ["/bin/zsh", "scripts/tailscale-serve-status.sh"],
+      "startCommand": ["/bin/zsh", "scripts/start-tailscale-serve-code-server.sh"],
+      "stopCommand": ["/bin/zsh", "scripts/stop-tailscale-serve-code-server.sh"]
+    },
+    {
+      "id": "dashboard-server",
+      "name": "Dashboard Server",
+      "description": "LaunchAgent-managed dashboard server on port 3000",
+      "statusType": "command",
+      "statusCheck": ["/bin/zsh", "scripts/dashboard-status.sh"],
+      "startCommand": ["/bin/zsh", "scripts/start-dashboard.sh"],
+      "stopCommand": ["/bin/zsh", "scripts/stop-dashboard.sh"],
+      "logPath": "logs/dashboard-server.log"
+    },
+    {
+      "id": "ollama-api",
+      "name": "Ollama API",
+      "description": "Local Ollama server on port 11434",
       "statusType": "url",
-      "statusCheck": "http://127.0.0.1:3001"
+      "statusCheck": "http://127.0.0.1:11434/api/tags"
+    },
+    {
+      "id": "local-app",
+      "name": "Local App",
+      "description": "Local desktop app HTTP endpoint on port 4000",
+      "statusType": "url",
+      "statusCheck": "http://127.0.0.1:4000"
+    },
+    {
+      "id": "mailpit-web",
+      "name": "Mailpit Web UI",
+      "description": "Mailpit web interface on port 10001",
+      "statusType": "url",
+      "statusCheck": "http://127.0.0.1:10001"
+    },
+    {
+      "id": "local-nginx",
+      "name": "Local Nginx",
+      "description": "Local web stack listening on HTTPS",
+      "statusType": "command",
+      "statusCheck": ["lsof", "-nP", "-iTCP:443", "-sTCP:LISTEN"]
+    },
+    {
+      "id": "local-mysql",
+      "name": "Local MySQL",
+      "description": "MySQL service used by the Local stack",
+      "statusType": "command",
+      "statusCheck": ["lsof", "-nP", "-iTCP:10004", "-sTCP:LISTEN"]
+    },
+    {
+      "id": "vscode-helper",
+      "name": "VS Code Helper",
+      "description": "Checks for Code Helper listener ports",
+      "statusType": "command",
+      "statusCheck": ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN", "-c", "Code"]
     }
   ],
   "actions": [
     {
-      "id": "list-node-processes",
-      "label": "List node processes",
-      "description": "Shows running Node.js processes",
-      "category": "Process checks",
-      "command": ["pgrep", "-fal", "node"],
+      "id": "start-code-server",
+      "label": "Start code-server",
+      "description": "Installs or reloads the user launch agent and starts code-server on localhost:8443",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/start-code-server.sh"],
+      "cwd": ".",
+      "timeoutMs": 20000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "start-dashboard-server",
+      "label": "Start dashboard server",
+      "description": "Builds the project and starts the LaunchAgent-managed dashboard server on port 3000",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/start-dashboard.sh"],
+      "cwd": ".",
+      "timeoutMs": 60000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "stop-dashboard-server",
+      "label": "Stop dashboard server",
+      "description": "Stops the LaunchAgent-managed dashboard server",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/stop-dashboard.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": true,
+      "streamOutput": false
+    },
+    {
+      "id": "start-tailscale-serve-code-server",
+      "label": "Start Tailscale HTTPS routes",
+      "description": "Publishes the dashboard at / and code-server at /code through Tailscale Serve over HTTPS",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/start-tailscale-serve-code-server.sh"],
+      "cwd": ".",
       "timeoutMs": 10000,
       "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "stop-tailscale-serve-code-server",
+      "label": "Stop Tailscale HTTPS routes",
+      "description": "Removes the Tailscale Serve mappings for the dashboard and code-server",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/stop-tailscale-serve-code-server.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": true,
+      "streamOutput": false
+    },
+    {
+      "id": "show-tailscale-serve-status",
+      "label": "Show Tailscale Serve status",
+      "description": "Displays the current Tailscale Serve configuration for secure HTTPS access",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/tailscale-serve-status.sh"],
+      "cwd": ".",
+      "timeoutMs": 5000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "stop-code-server",
+      "label": "Stop code-server",
+      "description": "Stops the dashboard-managed code-server process",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/stop-code-server.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": true,
+      "streamOutput": false
+    },
+    {
+      "id": "show-code-server-password",
+      "label": "Show code-server password",
+      "description": "Prints the generated password used to log into code-server",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/read-code-server-password.sh"],
+      "cwd": ".",
+      "timeoutMs": 5000,
+      "requiresConfirmation": true,
+      "streamOutput": false
+    },
+    {
+      "id": "bootstrap-code-server-extensions",
+      "label": "Bootstrap code-server extensions",
+      "description": "Copies your existing desktop VS Code AI and editor extensions into code-server",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/bootstrap-code-server-extensions.sh"],
+      "cwd": ".",
+      "timeoutMs": 20000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "list-code-server-extensions",
+      "label": "List code-server extensions",
+      "description": "Shows the extensions currently installed in code-server",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/code-server-list-extensions.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "install-code-server-launch-agent",
+      "label": "Install code-server launch agent",
+      "description": "Writes the macOS user LaunchAgent plist used by the dashboard-managed code-server service",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/install-code-server-launch-agent.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "install-dashboard-launch-agent",
+      "label": "Install dashboard launch agent",
+      "description": "Writes the macOS user LaunchAgent plist used by the dashboard server",
+      "category": "Remote coding",
+      "command": ["/bin/zsh", "scripts/install-dashboard-launch-agent.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "enable-ai-session-restore",
+      "label": "Enable AI session restore",
+      "description": "Installs and loads a LaunchAgent that recreates marked tmux AI sessions after login or reboot",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/start-ai-session-restore.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "start-codex-session",
+      "label": "Start Codex tmux session",
+      "description": "Starts a persistent Codex CLI session for this repo inside tmux and marks it for reboot restore",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/start-codex-session.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "start-claude-session",
+      "label": "Start Claude tmux session",
+      "description": "Starts a persistent Claude CLI session for this repo inside tmux and marks it for reboot restore",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/start-claude-session.sh"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "list-ai-sessions",
+      "label": "List AI tmux sessions",
+      "description": "Lists the persistent Codex or Claude sessions currently running",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/list-ai-sessions.sh"],
+      "cwd": ".",
+      "timeoutMs": 5000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "capture-codex-session",
+      "label": "Capture Codex session",
+      "description": "Shows the last 200 lines from the dashboard-codex tmux session",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/capture-ai-session.sh", "dashboard-codex"],
+      "cwd": ".",
+      "timeoutMs": 5000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "capture-claude-session",
+      "label": "Capture Claude session",
+      "description": "Shows the last 200 lines from the dashboard-claude tmux session",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/capture-ai-session.sh", "dashboard-claude"],
+      "cwd": ".",
+      "timeoutMs": 5000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "stop-codex-session",
+      "label": "Stop Codex session",
+      "description": "Stops the dashboard-codex tmux session and removes its reboot restore marker",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/stop-ai-session.sh", "dashboard-codex"],
+      "cwd": ".",
+      "timeoutMs": 5000,
+      "requiresConfirmation": true,
+      "streamOutput": false
+    },
+    {
+      "id": "stop-claude-session",
+      "label": "Stop Claude session",
+      "description": "Stops the dashboard-claude tmux session and removes its reboot restore marker",
+      "category": "AI sessions",
+      "command": ["/bin/zsh", "scripts/stop-ai-session.sh", "dashboard-claude"],
+      "cwd": ".",
+      "timeoutMs": 5000,
+      "requiresConfirmation": true,
       "streamOutput": false
     },
     {
       "id": "show-listening-ports",
       "label": "Show listening ports",
       "description": "Lists active listening TCP sockets",
-      "category": "Process checks",
+      "category": "System checks",
       "command": ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN"],
+      "timeoutMs": 15000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "show-web-stack-ports",
+      "label": "Show web stack ports",
+      "description": "Highlights Local, nginx, Mailpit, MySQL, and Ollama listeners",
+      "category": "System checks",
+      "command": ["lsof", "-nP", "-iTCP:80", "-iTCP:443", "-iTCP:4000", "-iTCP:10000", "-iTCP:10001", "-iTCP:10003", "-iTCP:10004", "-iTCP:11434", "-sTCP:LISTEN"],
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "show-ollama-models",
+      "label": "Show Ollama models",
+      "description": "Lists locally available Ollama models",
+      "category": "AI tools",
+      "command": ["ollama", "list"],
       "timeoutMs": 15000,
       "requiresConfirmation": false,
       "streamOutput": false
@@ -50,6 +337,28 @@
       "timeoutMs": 10000,
       "requiresConfirmation": false,
       "streamOutput": false
+    },
+    {
+      "id": "git-pull-dashboard",
+      "label": "Git pull dashboard repo",
+      "description": "Pulls the latest changes for this dashboard repository",
+      "category": "Project actions",
+      "command": ["git", "pull", "--ff-only"],
+      "cwd": ".",
+      "timeoutMs": 20000,
+      "requiresConfirmation": true,
+      "streamOutput": false
+    },
+    {
+      "id": "npm-run-build-dashboard",
+      "label": "Build dashboard",
+      "description": "Runs the production TypeScript build for this project",
+      "category": "Project actions",
+      "command": ["npm", "run", "build"],
+      "cwd": ".",
+      "timeoutMs": 60000,
+      "requiresConfirmation": false,
+      "streamOutput": false
     }
   ],
   "logs": [
@@ -58,14 +367,80 @@
       "name": "Dashboard audit log",
       "path": "logs/actions.log",
       "description": "Action and service execution records"
+    },
+    {
+      "id": "dashboard-server-log",
+      "name": "Dashboard server log",
+      "path": "logs/dashboard-server.log",
+      "description": "LaunchAgent-managed dashboard server output"
+    },
+    {
+      "id": "code-server-log",
+      "name": "code-server log",
+      "path": "logs/code-server.log",
+      "description": "Dashboard-managed code-server output"
+    },
+    {
+      "id": "codex-session-log",
+      "name": "Codex session log",
+      "path": "run/sessions/dashboard-codex.log",
+      "description": "Persistent Codex tmux session output"
+    },
+    {
+      "id": "claude-session-log",
+      "name": "Claude session log",
+      "path": "run/sessions/dashboard-claude.log",
+      "description": "Persistent Claude tmux session output"
+    },
+    {
+      "id": "ai-session-restore-log",
+      "name": "AI session restore log",
+      "path": "logs/ai-session-restore.log",
+      "description": "LaunchAgent output for reboot-time AI session restoration"
+    },
+    {
+      "id": "system-install-log",
+      "name": "System install log",
+      "path": "/var/log/install.log",
+      "description": "macOS install and package activity"
     }
   ],
   "links": [
     {
       "id": "code-server",
-      "label": "Code Server",
-      "url": "http://100.x.x.x:8443",
-      "description": "Replace with your Tailscale code-server URL"
+      "label": "code-server",
+      "url": "https://ferguss-mac-mini-2.tailc5efbd.ts.net/code",
+      "description": "Remote IDE via Tailscale HTTPS under the /code path"
+    },
+    {
+      "id": "this-dashboard",
+      "label": "This Dashboard",
+      "url": "https://ferguss-mac-mini-2.tailc5efbd.ts.net",
+      "description": "Open this Mac mini dashboard over Tailscale HTTPS"
+    },
+    {
+      "id": "local-app",
+      "label": "Local App",
+      "url": "http://ferguss-mac-mini-2.tailc5efbd.ts.net:4000",
+      "description": "Try the Local app over Tailscale if port 4000 is exposed"
+    },
+    {
+      "id": "mailpit",
+      "label": "Mailpit",
+      "url": "http://ferguss-mac-mini-2.tailc5efbd.ts.net:10001",
+      "description": "Mail testing UI on this Mac mini"
+    },
+    {
+      "id": "local-site-http",
+      "label": "Local Sites HTTP",
+      "url": "http://ferguss-mac-mini-2.tailc5efbd.ts.net",
+      "description": "Local nginx on port 80"
+    },
+    {
+      "id": "local-site-https",
+      "label": "Local Sites HTTPS",
+      "url": "https://ferguss-mac-mini-2.tailc5efbd.ts.net",
+      "description": "Local nginx on port 443"
     }
   ],
   "features": {

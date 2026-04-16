@@ -145,6 +145,13 @@ p {
   box-shadow: var(--shadow);
 }
 
+.focus-card {
+  border-color: rgba(86, 208, 201, 0.34);
+  background:
+    radial-gradient(circle at top right, rgba(86, 208, 201, 0.12), transparent 34%),
+    var(--bg-elevated);
+}
+
 .stat-card {
   min-height: 112px;
 }
@@ -223,6 +230,13 @@ code {
   gap: 1rem;
   text-decoration: none;
   color: inherit;
+}
+
+.link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 .link-arrow {

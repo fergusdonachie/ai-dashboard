@@ -7,6 +7,7 @@ const panels = document.querySelectorAll(".tab-panel");
 const statusBanner = document.getElementById("status-banner");
 const machineName = document.getElementById("machine-name");
 const machineMeta = document.getElementById("machine-meta");
+const focusPanel = document.getElementById("focus-panel");
 const homeCards = document.getElementById("home-cards");
 const servicesList = document.getElementById("services-list");
 const actionsList = document.getElementById("actions-list");
@@ -59,6 +60,35 @@ async function api(url, options = {}) {
 
 function renderHome(snapshot) {
   const usedMemory = snapshot.system.totalMemoryBytes - snapshot.system.freeMemoryBytes;
+  const codeServerService = snapshot.services.find((service) => service.id === "code-server");
+  const codeServerLink = snapshot.links.find((link) => link.id === "code-server");
+  const stateLabel = codeServerService?.state || "offline";
+  const detail =
+    codeServerService?.detail || "Install and start code-server to get a browser IDE on this Mac.";
+
+  focusPanel.innerHTML = `
+    <article class="card focus-card">
+      <div class="row-between">
+        <div>
+          <p class="eyebrow">Remote Coding</p>
+          <h2>code-server</h2>
+          <p class="muted">This is the main path to secure remote file access, editing, terminal use, and AI coding sessions over Tailscale.</p>
+        </div>
+        <span class="badge badge-${stateLabel}">${stateLabel}</span>
+      </div>
+      <p class="detail-text">${detail}</p>
+      <div class="button-row">
+        ${
+          codeServerLink
+            ? `<a class="primary-button link-button" href="${codeServerLink.url}" target="_blank" rel="noreferrer">Open IDE</a>`
+            : ""
+        }
+        <button class="secondary-button" data-tab-target="services">Service</button>
+        <button class="secondary-button" data-tab-target="actions">Setup</button>
+      </div>
+    </article>
+  `;
+
   const cards = [
     ["Role", snapshot.config.role],
     ["Host", snapshot.system.hostname],
@@ -253,6 +283,14 @@ document.getElementById("copy-log-button").addEventListener("click", async () =>
   await navigator.clipboard.writeText(logOutput.textContent || "");
 });
 document.getElementById("close-dialog").addEventListener("click", () => commandDialog.close());
+focusPanel.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-tab-target]");
+  if (!button) {
+    return;
+  }
+
+  setActiveTab(button.dataset.tabTarget);
+});
 
 servicesList.addEventListener("click", (event) => {
   const button = event.target.closest("button[data-service]");

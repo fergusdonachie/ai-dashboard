@@ -18,38 +18,41 @@ function getAuditLogPath(): string {
 
 export function createApiRouter(options: RouteOptions): Router {
   const router = Router();
+  const getConfig = (): DashboardConfig => loadConfig();
 
   router.get("/health", (_req, res) => {
+    const config = getConfig();
     res.json({
       ok: true,
-      profile: options.config.role,
+      profile: config.role,
       generatedAt: new Date().toISOString()
     });
   });
 
   router.get("/dashboard", async (_req, res) => {
     try {
+      const config = getConfig();
       const [system, services] = await Promise.all([
         getSystemSummary(options.startedAt),
-        getAllServiceStatuses(options.config)
+        getAllServiceStatuses(config)
       ]);
 
       res.json({
         generatedAt: new Date().toISOString(),
         config: {
-          machineName: options.config.machineName,
-          role: options.config.role,
-          features: options.config.features,
-          servicesCount: options.config.services.length,
-          actionsCount: options.config.actions.length,
-          logsCount: options.config.logs.length,
-          linksCount: options.config.links.length
+          machineName: config.machineName,
+          role: config.role,
+          features: config.features,
+          servicesCount: config.services.length,
+          actionsCount: config.actions.length,
+          logsCount: config.logs.length,
+          linksCount: config.links.length
         },
         system,
         services,
-        actions: options.config.actions,
-        logs: options.config.logs,
-        links: options.config.links
+        actions: config.actions,
+        logs: config.logs,
+        links: config.links
       });
     } catch (error) {
       res.status(500).json({ error: getErrorMessage(error) });
@@ -58,7 +61,7 @@ export function createApiRouter(options: RouteOptions): Router {
 
   router.get("/services", async (_req, res) => {
     try {
-      res.json(await getAllServiceStatuses(options.config));
+      res.json(await getAllServiceStatuses(getConfig()));
     } catch (error) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
@@ -66,7 +69,8 @@ export function createApiRouter(options: RouteOptions): Router {
 
   router.post("/services/:id/:operation", async (req, res) => {
     try {
-      const service = options.config.services.find((item) => item.id === req.params.id);
+      const config = getConfig();
+      const service = config.services.find((item) => item.id === req.params.id);
 
       if (!service) {
         res.status(404).json({ error: "Service not found" });
@@ -110,7 +114,8 @@ export function createApiRouter(options: RouteOptions): Router {
 
   router.post("/actions/:id/run", async (req, res) => {
     try {
-      const action = options.config.actions.find((item) => item.id === req.params.id);
+      const config = getConfig();
+      const action = config.actions.find((item) => item.id === req.params.id);
 
       if (!action) {
         res.status(404).json({ error: "Action not found" });
@@ -139,7 +144,7 @@ export function createApiRouter(options: RouteOptions): Router {
   router.get("/logs/:id", async (req, res) => {
     try {
       const lines = Number(req.query.lines || "200");
-      res.json(await readLastLines(options.config, req.params.id, lines));
+      res.json(await readLastLines(getConfig(), req.params.id, lines));
     } catch (error) {
       res.status(500).json({ error: getErrorMessage(error) });
     }
@@ -147,11 +152,11 @@ export function createApiRouter(options: RouteOptions): Router {
 
   router.get("/config/reload", (_req, res) => {
     try {
-      options.config = loadConfig();
+      const config = getConfig();
       res.json({
         ok: true,
-        machineName: options.config.machineName,
-        role: options.config.role
+        machineName: config.machineName,
+        role: config.role
       });
     } catch (error) {
       res.status(500).json({ error: getErrorMessage(error) });

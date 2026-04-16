@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "openai.chatgpt",
+    "anthropic.claude-code",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "davidanson.vscode-markdownlint",
+    "eamodio.gitlens"
+  ]
+}

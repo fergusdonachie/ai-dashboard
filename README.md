@@ -128,17 +128,17 @@ Use:
 - For tighter exposure, bind to the machine’s Tailscale IP instead.
 - Confirm macOS firewall rules allow inbound access to the chosen port from Tailscale.
 
-## launchd outline
+## launchd setup
 
-Create a `~/Library/LaunchAgents/com.yourname.ai-dashboard.plist` that runs `npm start` from this project directory with the right environment variables. Recommended settings:
+This repo includes macOS LaunchAgent helper scripts so the dashboard and `code-server` can come back after a reboot:
 
-- `WorkingDirectory` set to the repo root
-- `EnvironmentVariables` for `DASHBOARD_PROFILE`, `PORT`, and `HOST`
-- `RunAtLoad` set to `true`
-- `KeepAlive` set to `true`
-- `StandardOutPath` and `StandardErrorPath` pointed at files in `logs/`
+- `scripts/start-dashboard.sh`
+- `scripts/start-code-server.sh`
+- `scripts/start-ai-session-restore.sh`
 
-Load it with `launchctl load ~/Library/LaunchAgents/com.yourname.ai-dashboard.plist`.
+The dashboard server LaunchAgent runs the built server from `dist/server/index.js`, so rebuild with `npm run build` after code changes or just use `scripts/start-dashboard.sh`, which builds before restarting the service.
+
+AI tmux sessions are opt-in for reboot restore. When you start a session through `scripts/start-codex-session.sh` or `scripts/start-claude-session.sh`, the repo writes a restore marker under `run/autostart/`. The one-shot AI session LaunchAgent recreates those marked sessions on next login.
 
 ## Next recommended improvements
 
