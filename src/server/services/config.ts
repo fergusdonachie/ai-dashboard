@@ -10,7 +10,10 @@ export function getActiveProfile(): string {
 }
 
 export function loadConfig(profile = getActiveProfile()): DashboardConfig {
-  const configPath = path.join(configDirectory, `${profile}.json`);
+  const localConfigPath = path.join(configDirectory, `${profile}.local.json`);
+  const configPath = fs.existsSync(localConfigPath)
+    ? localConfigPath
+    : path.join(configDirectory, `${profile}.json`);
 
   if (!fs.existsSync(configPath)) {
     throw new Error(`Config profile not found: ${configPath}`);

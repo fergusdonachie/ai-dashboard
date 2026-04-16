@@ -1,5 +1,5 @@
 {
-  "machineName": "Ferguss-Mini",
+  "machineName": "Main Dev Mac",
   "role": "main",
   "port": 3000,
   "host": "0.0.0.0",
@@ -409,42 +409,43 @@
     {
       "id": "code-server",
       "label": "code-server",
-      "url": "https://ferguss-mac-mini-2.tailc5efbd.ts.net/code",
+      "url": "https://your-machine-name.your-tailnet.ts.net/code",
       "description": "Remote IDE via Tailscale HTTPS under the /code path"
     },
     {
       "id": "this-dashboard",
       "label": "This Dashboard",
-      "url": "https://ferguss-mac-mini-2.tailc5efbd.ts.net",
-      "description": "Open this Mac mini dashboard over Tailscale HTTPS"
+      "url": "https://your-machine-name.your-tailnet.ts.net",
+      "description": "Open this Mac dashboard over Tailscale HTTPS"
     },
     {
       "id": "local-app",
       "label": "Local App",
-      "url": "http://ferguss-mac-mini-2.tailc5efbd.ts.net:4000",
-      "description": "Try the Local app over Tailscale if port 4000 is exposed"
+      "url": "http://your-machine-name.your-tailnet.ts.net:4000",
+      "description": "Example local app endpoint over Tailscale"
     },
     {
       "id": "mailpit",
       "label": "Mailpit",
-      "url": "http://ferguss-mac-mini-2.tailc5efbd.ts.net:10001",
-      "description": "Mail testing UI on this Mac mini"
+      "url": "http://your-machine-name.your-tailnet.ts.net:10001",
+      "description": "Example mail testing UI on this Mac"
     },
     {
       "id": "local-site-http",
       "label": "Local Sites HTTP",
-      "url": "http://ferguss-mac-mini-2.tailc5efbd.ts.net",
-      "description": "Local nginx on port 80"
+      "url": "http://your-machine-name.your-tailnet.ts.net",
+      "description": "Example local nginx over HTTP"
     },
     {
       "id": "local-site-https",
       "label": "Local Sites HTTPS",
-      "url": "https://ferguss-mac-mini-2.tailc5efbd.ts.net",
-      "description": "Local nginx on port 443"
+      "url": "https://your-machine-name.your-tailnet.ts.net",
+      "description": "Example local nginx over HTTPS"
     }
   ],
   "features": {
-    "liveLogs": false,
-    "terminal": false
+    "allowActionExecution": true,
+    "allowLogViewing": true,
+    "showServiceDetails": true
   }
 }

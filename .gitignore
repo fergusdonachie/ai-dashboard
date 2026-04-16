@@ -4,3 +4,4 @@ dist
 logs
 run
 .code-server
+config/*.local.json
