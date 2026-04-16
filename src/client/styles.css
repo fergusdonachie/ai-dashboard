@@ -1,0 +1,264 @@
+:root {
+  color-scheme: dark;
+  --bg: #07111f;
+  --bg-elevated: rgba(12, 28, 48, 0.82);
+  --bg-muted: rgba(24, 49, 80, 0.7);
+  --border: rgba(153, 187, 220, 0.16);
+  --text: #f3f7fb;
+  --muted: #aac2d8;
+  --accent: #56d0c9;
+  --accent-strong: #1fa99f;
+  --warning: #e7b75a;
+  --danger: #e16969;
+  --success: #53d189;
+  --shadow: 0 22px 60px rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(86, 208, 201, 0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(231, 183, 90, 0.18), transparent 22%),
+    linear-gradient(180deg, #0a1628 0%, #07111f 100%);
+  color: var(--text);
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(100%, 720px);
+  margin: 0 auto;
+  padding: 1rem 1rem 4rem;
+}
+
+.hero,
+.row-between,
+.button-row,
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.hero {
+  padding: 1rem 0 0.5rem;
+}
+
+.eyebrow,
+.stat-label {
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.tab-bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  padding: 0.85rem 0;
+  background: linear-gradient(180deg, rgba(7, 17, 31, 0.94), rgba(7, 17, 31, 0.72));
+  backdrop-filter: blur(12px);
+}
+
+.tab-button,
+.primary-button,
+.secondary-button {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  color: var(--text);
+  background: var(--bg-muted);
+}
+
+.tab-button.active,
+.primary-button {
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: #062126;
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.secondary-button {
+  background: transparent;
+}
+
+.status-banner {
+  margin: 0.25rem 0 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(16, 35, 59, 0.85);
+  color: var(--muted);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.card-grid,
+.stack {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.card-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.card,
+.dialog-card,
+.link-card {
+  padding: 1rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+.stat-card {
+  min-height: 112px;
+}
+
+.stat-value {
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.badge {
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.badge-online {
+  background: rgba(83, 209, 137, 0.18);
+  color: #8af0b1;
+}
+
+.badge-offline {
+  background: rgba(225, 105, 105, 0.18);
+  color: #ffb0b0;
+}
+
+.badge-degraded {
+  background: rgba(231, 183, 90, 0.18);
+  color: #f7d289;
+}
+
+.detail-text {
+  margin: 0.8rem 0;
+  color: var(--muted);
+}
+
+.field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  background: rgba(7, 17, 31, 0.9);
+  color: var(--text);
+}
+
+.terminal-output,
+code {
+  font-family: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+.terminal-output {
+  overflow: auto;
+  min-height: 280px;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 16px;
+  background: #05101d;
+  border: 1px solid rgba(86, 208, 201, 0.16);
+  white-space: pre-wrap;
+  color: #dbe7f2;
+}
+
+.terminal-output.empty {
+  color: var(--muted);
+}
+
+.link-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.link-arrow {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.command-dialog {
+  width: min(92vw, 760px);
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.command-dialog::backdrop {
+  background: rgba(2, 8, 15, 0.74);
+}
+
+.dialog-card {
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tab-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .button-row,
+  .row-between,
+  .hero,
+  .dialog-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

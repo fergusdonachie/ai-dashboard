@@ -1,0 +1,75 @@
+{
+  "machineName": "Main Dev Mac Mini",
+  "role": "main",
+  "port": 3000,
+  "host": "0.0.0.0",
+  "services": [
+    {
+      "id": "vscode",
+      "name": "VS Code",
+      "description": "Checks for a Visual Studio Code process",
+      "statusType": "process",
+      "statusCheck": "Visual Studio Code"
+    },
+    {
+      "id": "local-docs",
+      "name": "Local Docs",
+      "description": "Checks a local documentation server",
+      "statusType": "url",
+      "statusCheck": "http://127.0.0.1:3001"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list-node-processes",
+      "label": "List node processes",
+      "description": "Shows running Node.js processes",
+      "category": "Process checks",
+      "command": ["pgrep", "-fal", "node"],
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "show-listening-ports",
+      "label": "Show listening ports",
+      "description": "Lists active listening TCP sockets",
+      "category": "Process checks",
+      "command": ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN"],
+      "timeoutMs": 15000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "git-status-dashboard",
+      "label": "Git status in dashboard repo",
+      "description": "Shows current git state for this project",
+      "category": "Project actions",
+      "command": ["git", "status", "--short"],
+      "cwd": ".",
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    }
+  ],
+  "logs": [
+    {
+      "id": "dashboard-audit-log",
+      "name": "Dashboard audit log",
+      "path": "logs/actions.log",
+      "description": "Action and service execution records"
+    }
+  ],
+  "links": [
+    {
+      "id": "code-server",
+      "label": "Code Server",
+      "url": "http://100.x.x.x:8443",
+      "description": "Replace with your Tailscale code-server URL"
+    }
+  ],
+  "features": {
+    "liveLogs": false,
+    "terminal": false
+  }
+}

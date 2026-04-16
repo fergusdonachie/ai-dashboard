@@ -1,0 +1,67 @@
+{
+  "machineName": "OpenClaw Mac Mini",
+  "role": "openclaw",
+  "port": 3000,
+  "host": "0.0.0.0",
+  "services": [
+    {
+      "id": "openclaw-daemon",
+      "name": "OpenClaw Daemon",
+      "description": "Checks for an OpenClaw process match",
+      "statusType": "process",
+      "statusCheck": "openclaw",
+      "startCommand": ["echo", "Replace with the real launchctl start command"],
+      "restartCommand": ["echo", "Replace with the real launchctl restart command"],
+      "logPath": "logs/openclaw.log"
+    },
+    {
+      "id": "openclaw-web",
+      "name": "OpenClaw Local UI",
+      "description": "Checks the local OpenClaw HTTP UI",
+      "statusType": "url",
+      "statusCheck": "http://127.0.0.1:8080"
+    }
+  ],
+  "actions": [
+    {
+      "id": "openclaw-doctor",
+      "label": "Run OpenClaw doctor",
+      "description": "Placeholder diagnostic command. Replace with the real OpenClaw doctor command.",
+      "category": "Diagnostics",
+      "command": ["echo", "Replace this with your OpenClaw doctor command"],
+      "timeoutMs": 30000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    },
+    {
+      "id": "list-openclaw-processes",
+      "label": "List OpenClaw processes",
+      "description": "Shows matching processes via pgrep",
+      "category": "Diagnostics",
+      "command": ["pgrep", "-fal", "openclaw"],
+      "timeoutMs": 10000,
+      "requiresConfirmation": false,
+      "streamOutput": false
+    }
+  ],
+  "logs": [
+    {
+      "id": "openclaw-main-log",
+      "name": "OpenClaw main log",
+      "path": "logs/openclaw.log",
+      "description": "Replace with the real daemon log path"
+    }
+  ],
+  "links": [
+    {
+      "id": "openclaw-local-ui",
+      "label": "OpenClaw UI",
+      "url": "http://100.x.x.x:8080",
+      "description": "Replace with the Tailscale or local OpenClaw URL"
+    }
+  ],
+  "features": {
+    "liveLogs": false,
+    "terminal": false
+  }
+}
