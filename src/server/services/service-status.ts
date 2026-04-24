@@ -21,9 +21,13 @@ async function checkProcess(pattern: string): Promise<Pick<ServiceStatus, "state
   };
 }
 
-async function checkCommand(command: string[]): Promise<Pick<ServiceStatus, "state" | "detail">> {
+async function checkCommand(
+  command: string[],
+  cwd?: string
+): Promise<Pick<ServiceStatus, "state" | "detail">> {
   const result = await runCommand({
     command,
+    cwd,
     timeoutMs: 8_000
   });
 
@@ -73,7 +77,8 @@ async function getStatus(service: ServiceConfig): Promise<ServiceStatus> {
       break;
     case "command":
       baseStatus = await checkCommand(
-        Array.isArray(service.statusCheck) ? service.statusCheck : [String(service.statusCheck)]
+        Array.isArray(service.statusCheck) ? service.statusCheck : [String(service.statusCheck)],
+        service.cwd
       );
       break;
     case "url":

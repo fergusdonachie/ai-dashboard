@@ -11,5 +11,5 @@ fi
 
 "$TAILSCALE_BIN" serve reset >/dev/null 2>&1 || true
 "$TAILSCALE_BIN" serve --bg --https=443 127.0.0.1:3000
-"$TAILSCALE_BIN" serve --bg --https=443 --set-path /code 127.0.0.1:8443
-echo "Tailscale Serve configured for the dashboard at / and code-server at /code"
+"$TAILSCALE_BIN" serve --bg --https=8443 127.0.0.1:8443
+echo "Tailscale Serve configured for the dashboard on HTTPS port 443 and code-server on HTTPS port 8443"

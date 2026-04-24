@@ -1,5 +1,6 @@
 const state = {
-  snapshot: null
+  snapshot: null,
+  runningCommands: new Set()
 };
 
 const tabs = document.querySelectorAll(".tab-button");
@@ -220,6 +221,14 @@ async function loadDashboard() {
 }
 
 async function runServiceOperation(serviceId, operation) {
+  const commandKey = `service:${serviceId}:${operation}`;
+
+  if (state.runningCommands.has(commandKey)) {
+    return;
+  }
+
+  state.runningCommands.add(commandKey);
+
   try {
     const result = await api(`/api/services/${serviceId}/${operation}`, {
       method: "POST"
@@ -232,15 +241,25 @@ async function runServiceOperation(serviceId, operation) {
     await loadDashboard();
   } catch (error) {
     openDialog("Service error", "Request failed", error.message);
+  } finally {
+    state.runningCommands.delete(commandKey);
   }
 }
 
 async function runAction(actionId) {
+  const commandKey = `action:${actionId}`;
+
+  if (state.runningCommands.has(commandKey)) {
+    return;
+  }
+
   const action = state.snapshot?.actions.find((item) => item.id === actionId);
 
   if (action?.requiresConfirmation && !window.confirm(`Run ${action.label}?`)) {
     return;
   }
+
+  state.runningCommands.add(commandKey);
 
   try {
     const result = await api(`/api/actions/${actionId}/run`, {
@@ -254,6 +273,8 @@ async function runAction(actionId) {
     await loadDashboard();
   } catch (error) {
     openDialog("Action error", "Request failed", error.message);
+  } finally {
+    state.runningCommands.delete(commandKey);
   }
 }
 
@@ -292,22 +313,36 @@ focusPanel.addEventListener("click", (event) => {
   setActiveTab(button.dataset.tabTarget);
 });
 
-servicesList.addEventListener("click", (event) => {
+servicesList.addEventListener("click", async (event) => {
   const button = event.target.closest("button[data-service]");
   if (!button) {
     return;
   }
 
-  runServiceOperation(button.dataset.service, button.dataset.operation);
+  button.disabled = true;
+  try {
+    await runServiceOperation(button.dataset.service, button.dataset.operation);
+  } finally {
+    if (button.isConnected) {
+      button.disabled = false;
+    }
+  }
 });
 
-actionsList.addEventListener("click", (event) => {
+actionsList.addEventListener("click", async (event) => {
   const button = event.target.closest("button[data-action]");
   if (!button) {
     return;
   }
 
-  runAction(button.dataset.action);
+  button.disabled = true;
+  try {
+    await runAction(button.dataset.action);
+  } finally {
+    if (button.isConnected) {
+      button.disabled = false;
+    }
+  }
 });
 
 loadDashboard();

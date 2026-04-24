@@ -12,6 +12,7 @@
       "statusCheck": ["/bin/zsh", "scripts/code-server-status.sh"],
       "startCommand": ["/bin/zsh", "scripts/start-code-server.sh"],
       "stopCommand": ["/bin/zsh", "scripts/stop-code-server.sh"],
+      "cwd": ".",
       "logPath": "logs/code-server.log"
     },
     {
@@ -21,7 +22,8 @@
       "statusType": "command",
       "statusCheck": ["/bin/zsh", "scripts/tailscale-serve-status.sh"],
       "startCommand": ["/bin/zsh", "scripts/start-tailscale-serve-code-server.sh"],
-      "stopCommand": ["/bin/zsh", "scripts/stop-tailscale-serve-code-server.sh"]
+      "stopCommand": ["/bin/zsh", "scripts/stop-tailscale-serve-code-server.sh"],
+      "cwd": "."
     },
     {
       "id": "dashboard-server",
@@ -31,6 +33,7 @@
       "statusCheck": ["/bin/zsh", "scripts/dashboard-status.sh"],
       "startCommand": ["/bin/zsh", "scripts/start-dashboard.sh"],
       "stopCommand": ["/bin/zsh", "scripts/stop-dashboard.sh"],
+      "cwd": ".",
       "logPath": "logs/dashboard-server.log"
     },
     {
@@ -113,7 +116,7 @@
     {
       "id": "start-tailscale-serve-code-server",
       "label": "Start Tailscale HTTPS routes",
-      "description": "Publishes the dashboard at / and code-server at /code through Tailscale Serve over HTTPS",
+      "description": "Publishes the dashboard on HTTPS port 443 and code-server on HTTPS port 8443 through Tailscale Serve",
       "category": "Remote coding",
       "command": ["/bin/zsh", "scripts/start-tailscale-serve-code-server.sh"],
       "cwd": ".",
@@ -409,8 +412,8 @@
     {
       "id": "code-server",
       "label": "code-server",
-      "url": "https://your-machine-name.your-tailnet.ts.net/code",
-      "description": "Remote IDE via Tailscale HTTPS under the /code path"
+      "url": "https://your-machine-name.your-tailnet.ts.net:8443",
+      "description": "Remote IDE via Tailscale HTTPS on port 8443"
     },
     {
       "id": "this-dashboard",

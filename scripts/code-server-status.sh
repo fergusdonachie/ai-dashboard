@@ -6,8 +6,17 @@ ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 LABEL="com.ai-dashboard.code-server"
 DOMAIN="gui/$(id -u)"
 PASSWORD_FILE="$ROOT_DIR/run/code-server-password.txt"
+CODE_SERVER_BIN="${CODE_SERVER_BIN:-}"
 
-if ! command -v code-server >/dev/null 2>&1; then
+if [[ -z "$CODE_SERVER_BIN" && -x "$HOME/.local/bin/code-server" ]]; then
+  CODE_SERVER_BIN="$HOME/.local/bin/code-server"
+fi
+
+if [[ -z "$CODE_SERVER_BIN" ]]; then
+  CODE_SERVER_BIN="$(command -v code-server || true)"
+fi
+
+if [[ -z "$CODE_SERVER_BIN" ]]; then
   echo "code-server not installed"
   exit 1
 fi
